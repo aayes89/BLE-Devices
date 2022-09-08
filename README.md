@@ -25,12 +25,13 @@ Non-Bundled Plugins:
   - br.com.dynamiclight.android-master-tools (0.3)
 
 Uses permission on Manifest
-  <uses-permission android:name="android.permission.BLUETOOTH" />
-  <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-  <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+  - android.permission.BLUETOOTH
+  - android.permission.BLUETOOTH_SCAN
+  - android.permission.BLUETOOTH_CONNECT
+  - android.permission.BLUETOOTH_ADMIN
+  Depends on API
+    - android.permission.ACCESS_COARSE_LOCATION 
+    - android.permission.ACCESS_FINE_LOCATION
 
 - Non-MVC and MVVM model
 - Simple implementation of RecyclerView, allows to get the device depending on the touch events handled by the RecyclerView adapter
