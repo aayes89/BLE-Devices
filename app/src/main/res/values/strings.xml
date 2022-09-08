@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MyZetrack</string>
+    <string name="switch_blue">Enable Bluetooth Scanner</string>
+    <string name="btn_connect">Stablish connection</string>
+    <string name="btn_title">Send Data</string>
+    <string name="btn_update_clock">Update Clock</string>
+    <string name="unknown_dev">Unknown device</string>
+    <string name="pic">pic_name</string>
+</resources>
