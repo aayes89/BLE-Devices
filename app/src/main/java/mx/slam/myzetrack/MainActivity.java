@@ -78,18 +78,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Make sure we have access coarse location enabled, if not, prompt the user to enable it
+        // have access coarse location or fine location permission enabled, if not, prompt the user to enable it
         if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("This app needs location access");
-            builder.setMessage("Please grant location access so this app can detect peripherals.");
+            builder.setTitle("This needs location access");
+            builder.setMessage("Please grant location access to detect peripherals.");
             builder.setPositiveButton(android.R.string.ok, null);
             builder.setOnDismissListener(dialog -> requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1));
             builder.show();
         }
     }
 
-    // Device scan callback.
+    // Scan callback.
     private final ScanCallback leScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
@@ -120,21 +120,21 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    // Device connect call back
+    // Device connection call back
     private final BluetoothGattCallback btleGattCallback = new BluetoothGattCallback() {
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
-            // this will get called anytime you perform a read or write characteristic operation
+            // show read or write characteristic operation
             MainActivity.this.runOnUiThread(() -> Log.v(TAG,"device read or wrote to "+gatt.getDevice().getAddress()+"\n"));
         }
 
         @SuppressLint("MissingPermission")
         @Override
-        public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
-            // this will get called when a device connects or disconnects
-            Log.v(TAG,"New state: "+newState);
-            switch (newState) {
+        public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int state) {
+            // show when a device connects or disconnects
+            Log.v(TAG,"New state: "+ state);
+            switch (state) {
                 case 0:
                     MainActivity.this.runOnUiThread(() -> {
                         Log.v(TAG,"device disconnected\n");
@@ -147,35 +147,35 @@ public class MainActivity extends AppCompatActivity {
                         aSwitch.setChecked(true);
                     });
 
-                    // discover services and characteristics for this device
+                    // discover services and characteristics for a device
                     bluetoothGatt.discoverServices();
 
                     break;
                 default:
-                    MainActivity.this.runOnUiThread(() -> Log.v(TAG,"we encountered an unknown state, uh oh\n"));
+                    MainActivity.this.runOnUiThread(() -> Log.v(TAG,"unknown state!\n"));
                     break;
             }
         }
 
         @Override
         public void onServicesDiscovered(final BluetoothGatt gatt, final int status) {
-            // this will get called after the client initiates a 			BluetoothGatt.discoverServices() call
-            MainActivity.this.runOnUiThread(() -> Log.v(TAG,"device services have been discovered\n"));
+            // when a service is discovered
+            MainActivity.this.runOnUiThread(() -> Log.v(TAG,"device service have been discovered\n"));
             displayGattServices(bluetoothGatt.getServices());
         }
 
         @Override
-        // Result of a characteristic read operation
+        // Broadcast a characteristic when read operation occurs
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                broadcastUpdate(characteristic);
+                informUpdate(characteristic);
             }
         }
     };
 
-    private void broadcastUpdate(final BluetoothGattCharacteristic characteristic) {
+    private void informUpdate(final BluetoothGattCharacteristic characteristic) {
         Log.v(TAG,"UUID: "+characteristic.getUuid());
     }
 
@@ -209,13 +209,13 @@ public class MainActivity extends AppCompatActivity {
         });
         if(oneTimeScan) {
             oneTimeScan = false;
-            /*bluetoothHandler.postDelayed(this::startScanning, SCAN_PERIOD);*/
+
         }
         Log.v(TAG,"Scanning started\n");
     }
 
     public void stopScanning() {
-        Log.v(TAG,"stopping scanning");
+        Log.v(TAG,"Stopping scanning");
         aSwitch.setChecked(false);
         AsyncTask.execute(() -> {
             try {
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     public void connectToDeviceSelected() {
         StringBuilder dev = new StringBuilder();
-        Log.v(TAG, "Trying to connect to devices.... on pos: "+pos);
+        Log.v(TAG, "Trying to connect to selected device on recycler adapter pos: "+pos);
         if(!bluetoothDevices.isEmpty() && pos>=0) {
             BLEDevice devices = bluetoothDevices.get(pos);
             dev.append("Name: ").append(devices.getName());
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     public void disconnectDeviceSelected() {
         if(bluetoothGatt!=null) {
-            Log.v(TAG, "Disconnecting from device\n");
+            Log.v(TAG, "Disconnecting from selected device\n");
             bluetoothGatt.disconnect();
         }
     }
@@ -253,23 +253,23 @@ public class MainActivity extends AppCompatActivity {
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null) return;
 
-        // Loops through available GATT Services.
+        // Available GATT Services.
         for (BluetoothGattService gattService : gattServices) {
 
             final String uuid = gattService.getUuid().toString();
             Log.v(TAG,"Service discovered: " + uuid);
-            MainActivity.this.runOnUiThread(() -> Log.v(TAG,"Service discovered: "+uuid+"\n"));
+            //MainActivity.this.runOnUiThread(() -> Log.v(TAG,"Service discovered: "+uuid+"\n"));
             new ArrayList<HashMap<String, String>>();
             List<BluetoothGattCharacteristic> gattCharacteristics =
                     gattService.getCharacteristics();
 
-            // Loops through available Characteristics.
+            // Available Characteristics.
             for (BluetoothGattCharacteristic gattCharacteristic :
                     gattCharacteristics) {
 
                 final String charUuid = gattCharacteristic.getUuid().toString();
                 Log.v(TAG,"Characteristic discovered for service: " + charUuid);
-                MainActivity.this.runOnUiThread(() -> Log.v(TAG,"Characteristic discovered for service: "+charUuid+"\n"));
+                //MainActivity.this.runOnUiThread(() -> Log.v(TAG,"Characteristic discovered for service: "+charUuid+"\n"));
 
             }
         }
